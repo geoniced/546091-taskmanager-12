@@ -9,7 +9,7 @@ import LoadMoreButtonView from './view/load-more-button.js';
 import NoTaskView from './view/no-task.js';
 import {generateTask} from './mock/task.js';
 import {generateFilter} from './mock/filter.js';
-import {render, RenderPosition} from './utils.js';
+import {render, RenderPosition} from './utils/render.js';
 
 const TASK_COUNT = 22;
 const TASK_COUNT_PER_STEP = 8;
