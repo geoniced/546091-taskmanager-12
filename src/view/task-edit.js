@@ -148,23 +148,18 @@ export default class TaskEdit extends AbstractView {
     this._data = TaskEdit.parseTaskToData(task);
 
     this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._descriptionInputHandler = this._descriptionInputHandler.bind(this);
     this._dueDateToggleHandler = this._dueDateToggleHandler.bind(this);
     this._repeatingToggleHandler = this._repeatingToggleHandler.bind(this);
 
-    this.getElement()
-      .querySelector(`.card__date-deadline-toggle`)
-      .addEventListener(`click`, this._dueDateToggleHandler);
-
-    this.getElement()
-      .querySelector(`.card__repeat-toggle`)
-      .addEventListener(`click`, this._repeatingToggleHandler);
+    this._setInnerHandlers();
   }
 
   getTemplate() {
     return createTaskEditTemplate(this._data);
   }
 
-  updateData(update) {
+  updateData(update, justDataUpdating) {
     if (!update) {
       return;
     }
@@ -174,6 +169,10 @@ export default class TaskEdit extends AbstractView {
         this._data,
         update
     );
+
+    if (justDataUpdating) {
+      return;
+    }
 
     this.updateElement();
   }
@@ -187,20 +186,48 @@ export default class TaskEdit extends AbstractView {
 
     parent.replaceChild(newElement, prevElement);
     prevElement = null;
+
+    this.restoreHandlers();
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+    .querySelector(`.card__date-deadline-toggle`)
+    .addEventListener(`click`, this._dueDateToggleHandler);
+
+    this.getElement()
+      .querySelector(`.card__repeat-toggle`)
+      .addEventListener(`click`, this._repeatingToggleHandler);
+
+    this.getElement()
+      .querySelector(`.card__text`)
+      .addEventListener(`input`, this._descriptionInputHandler);
   }
 
   _dueDateToggleHandler(evt) {
     evt.preventDefault();
     this.updateData({
       isDueDate: !this._data.isDueDate
-    })
+    });
   }
 
   _repeatingToggleHandler(evt) {
     evt.preventDefault();
     this.updateData({
       isRepeating: !this._data.isRepeating
-    })
+    });
+  }
+
+  _descriptionInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      description: evt.target.value
+    }, true);
   }
 
   _formSubmitHandler(evt) {
