@@ -6,7 +6,7 @@ import NoTaskView from '../view/no-task.js';
 import TaskPresenter from './task.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {sortTaskUp, sortTaskDown} from '../utils/task.js';
-import {SortType} from '../const.js';
+import {SortType, UpdateType,UserAction} from '../const.js';
 
 const TASK_COUNT_PER_STEP = 8;
 
@@ -58,18 +58,33 @@ export default class Board {
   }
 
   _handleViewAction(actionType, updateType, update) {
-    console.log(actionType, updateType, update);
-    // Здесь будет вызов обновления модели
-    // actionType – тип действия пользователя, что он сделал с задачей – нужен чтобы понять какой метод модели вызвать (UPDATE_TASK...)
-    // updateType – тип изменений, нужен, чтобы понять насколько крупные изменения и что нужно обновлять (MAJOR, MINOR...)
-    // update – обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_TASK:
+        this._tasksModel.updateTask(updateType, update);
+        break;
+      case UserAction.ADD_TASK:
+        this._tasksModel.addTask(updateType, update);
+        break;
+      case UserAction.DELETE_TASK:
+        this._tasksModel.deleteTask(updateType, update);
+        break;
+    }
   }
 
-  _handleModelEvent(updateType, update) {
+  _handleModelEvent(updateType, data) {
     // В зависимости от типа изменений решаем, что делать:
-    // – обновить часть списка – лишь задачу – когда например изменилось описание
-    // – обновить список (карточки, кнопка лодмор) – например когда задача ушла в архив
-    // – обновить всю доску (список+сортировки...) – например при переключении фильтра
+    switch (updateType) {
+      // – обновить часть списка – лишь задачу – когда например изменилось описание
+      case UpdateType.PATCH:
+        this._taskPresenter[data.id].init(data);
+        break;
+      case UpdateType.MINOR:
+        // – обновить список (карточки, кнопка лодмор) – например когда задача ушла в архив
+        break;
+      case UpdateType.MAJOR:
+        // – обновить всю доску (список+сортировки...) – например при переключении фильтра
+        break;
+    }
   }
 
   _handleSortTypeChange(sortType) {
