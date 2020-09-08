@@ -4,7 +4,6 @@ import TaskListView from '../view/task-list.js';
 import LoadMoreButtonView from '../view/load-more-button.js';
 import NoTaskView from '../view/no-task.js';
 import TaskPresenter from './task.js';
-import {updateItem} from '../utils/common.js';
 import {render, RenderPosition, remove} from '../utils/render.js';
 import {sortTaskUp, sortTaskDown} from '../utils/task.js';
 import {SortType} from '../const.js';
@@ -25,10 +24,13 @@ export default class Board {
     this._noTaskComponent = new NoTaskView();
     this._loadMoreButtonComponent = new LoadMoreButtonView();
 
-    this._handleTaskChange = this._handleTaskChange.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+
+    this._tasksModel.addObserver(this._handleModelEvent);
   }
 
   init() {
@@ -55,9 +57,19 @@ export default class Board {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _handleTaskChange(updatedTask) {
+  _handleViewAction(actionType, updateType, update) {
+    console.log(actionType, updateType, update);
     // Здесь будет вызов обновления модели
-    this._taskPresenter[updatedTask.id].init(updatedTask);
+    // actionType – тип действия пользователя, что он сделал с задачей – нужен чтобы понять какой метод модели вызвать (UPDATE_TASK...)
+    // updateType – тип изменений, нужен, чтобы понять насколько крупные изменения и что нужно обновлять (MAJOR, MINOR...)
+    // update – обновленные данные
+  }
+
+  _handleModelEvent(updateType, update) {
+    // В зависимости от типа изменений решаем, что делать:
+    // – обновить часть списка – лишь задачу – когда например изменилось описание
+    // – обновить список (карточки, кнопка лодмор) – например когда задача ушла в архив
+    // – обновить всю доску (список+сортировки...) – например при переключении фильтра
   }
 
   _handleSortTypeChange(sortType) {
@@ -76,7 +88,7 @@ export default class Board {
   }
 
   _renderTask(task) {
-    const taskPresenter = new TaskPresenter(this._taskListComponent, this._handleTaskChange, this._handleModeChange);
+    const taskPresenter = new TaskPresenter(this._taskListComponent, this._handleViewAction, this._handleModeChange);
     taskPresenter.init(task);
     this._taskPresenter[task.id] = taskPresenter;
   }
