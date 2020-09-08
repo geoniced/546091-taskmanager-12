@@ -31,10 +31,7 @@ export default class Board {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
-  init(boardTasks) {
-    this._boardTasks = boardTasks.slice();
-    this._sourcedBoardTasks = boardTasks.slice();
-
+  init() {
     render(this._boardContainer, this._boardComponent, RenderPosition.BEFOREEND);
     render(this._boardComponent, this._taskListComponent, RenderPosition.BEFOREEND);
 
@@ -42,6 +39,13 @@ export default class Board {
   }
 
   _getTasks() {
+    switch (this._currentSortType) {
+      case SortType.DATE_UP:
+        return this._tasksModel.getTasks().slice().sort(sortTaskUp);
+      case SortType.DATE_DOWN:
+        return this._tasksModel.getTasks().slice().sort(sortTaskDown);
+    }
+
     return this._tasksModel.getTasks();
   }
 
@@ -52,25 +56,8 @@ export default class Board {
   }
 
   _handleTaskChange(updatedTask) {
-    this._boardTasks = updateItem(this._boardTasks, updatedTask);
-    this._sourcedBoardTasks = updateItem(this._sourcedBoardTasks, updatedTask);
+    // Здесь будет вызов обновления модели
     this._taskPresenter[updatedTask.id].init(updatedTask);
-  }
-
-  _sortTasks(sortType) {
-    switch (sortType) {
-      case SortType.DATE_UP:
-        this._boardTasks.sort(sortTaskUp);
-        break;
-      case SortType.DATE_DOWN:
-        this._boardTasks.sort(sortTaskDown);
-        break;
-      default:
-        this._boardTasks = this._sourcedBoardTasks.slice();
-        break;
-    }
-
-    this._currentSortType = sortType;
   }
 
   _handleSortTypeChange(sortType) {
@@ -78,7 +65,7 @@ export default class Board {
       return;
     }
 
-    this._sortTasks(sortType);
+    this._currentSortType = sortType;
     this._clearTaskList();
     this._renderTaskList();
   }
@@ -94,10 +81,8 @@ export default class Board {
     this._taskPresenter[task.id] = taskPresenter;
   }
 
-  _renderTasks(from, to) {
-    this._boardTasks
-    .slice(from, to)
-    .forEach((boardTask) => this._renderTask(boardTask));
+  _renderTasks(tasks) {
+    tasks.forEach((task) => this._renderTask(task));
   }
 
   _renderNoTasks() {
@@ -105,10 +90,14 @@ export default class Board {
   }
 
   _handleLoadMoreButtonClick() {
-    this._renderTasks(this._renderedTaskCount, this._renderedTaskCount + TASK_COUNT_PER_STEP);
-    this._renderedTaskCount += TASK_COUNT_PER_STEP;
+    const taskCount = this._getTasks().length;
+    const newRenderedTasksCount = Math.min(taskCount, this._renderedTaskCount + TASK_COUNT_PER_STEP);
+    const tasks = this._getTasks().slice(this._renderedTaskCount, newRenderedTasksCount);
 
-    if (this._renderedTaskCount >= this._boardTasks.length) {
+    this._renderTasks(tasks);
+    this._renderedTaskCount = newRenderedTasksCount;
+
+    if (this._renderedTaskCount >= taskCount) {
       remove(this._loadMoreButtonComponent);
     }
   }
@@ -129,15 +118,18 @@ export default class Board {
   }
 
   _renderTaskList() {
-    this._renderTasks(0, Math.min(this._boardTasks.length, TASK_COUNT_PER_STEP));
+    const taskCount = this._getTasks().length;
+    const tasks = this._getTasks().slice(0, Math.min(taskCount, TASK_COUNT_PER_STEP));
 
-    if (this._boardTasks.length > TASK_COUNT_PER_STEP) {
+    this._renderTasks(tasks);
+
+    if (taskCount > TASK_COUNT_PER_STEP) {
       this._renderLoadMoreButton();
     }
   }
 
   _renderBoard() {
-    if (this._boardTasks.every((task) => task.isArchive)) {
+    if (this._getTasks().every((task) => task.isArchive)) {
       this._renderNoTasks();
       return;
     }
