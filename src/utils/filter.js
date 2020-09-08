@@ -1,7 +1,7 @@
 import {FilterType} from '../const.js';
 import {isTaskExpired, isTaskExpiringToday, isTaskRepeating} from "../utils/task.js";
 
-export const taskToFilterMap = {
+export const filter = {
   [FilterType.ALL]: (tasks) => tasks.filter((task) => !task.isArchive),
   [FilterType.OVERDUE]: (tasks) => tasks.filter((task) => isTaskExpired(task.dueDate)),
   [FilterType.TODAY]: (tasks) => tasks.filter((task) => isTaskExpiringToday(task.dueDate)),
