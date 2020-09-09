@@ -1,5 +1,4 @@
 import SiteMenuView from './view/site-menu.js';
-import FilterView from './view/filter.js';
 import {generateTask} from './mock/task.js';
 import BoardPresenter from './presenter/board.js';
 import FilterPresenter from './presenter/filter.js';
@@ -26,3 +25,8 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, tasksM
 
 filterPresenter.init();
 boardPresenter.init();
+
+document.querySelector(`#control__new-task`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  boardPresenter.createTask();
+});

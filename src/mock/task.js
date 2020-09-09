@@ -2,7 +2,7 @@ import {COLORS} from '../const.js';
 import {getRandomInteger} from '../utils/common.js';
 
 // in production, I should use something better, i.e https://github.com/ai/nanoid
-const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
+export const generateId = () => Date.now() + parseInt(Math.random() * 10000, 10);
 
 const getDescription = () => {
   const descriptions = [
