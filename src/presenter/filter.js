@@ -83,6 +83,6 @@ export default class Filter {
         name: `Archive`,
         count: filter[FilterType.ARCHIVE](tasks).length
       }
-    ]
+    ];
   }
 }

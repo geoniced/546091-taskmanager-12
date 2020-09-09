@@ -1,5 +1,4 @@
 import Observer from '../utils/observer.js';
-import { isTaskRepeating } from '../utils/task.js';
 import {FilterType} from '../const.js';
 
 export default class Filter extends Observer {
