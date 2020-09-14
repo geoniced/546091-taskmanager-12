@@ -25,9 +25,16 @@ render(siteHeaderElement, siteMenuComponent, RenderPosition.BEFOREEND);
 const boardPresenter = new BoardPresenter(siteMainElement, tasksModel, filterModel);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, tasksModel);
 
+const handleTaskNewFormClose = () => {
+  siteMenuComponent.getElement().querySelector(`[value=${MenuItem.TASKS}]`).disabled = false;
+  siteMenuComponent.setMenuItem(MenuItem.TASKS);
+};
+
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_NEW_TASK:
+      boardPresenter.createTask(handleTaskNewFormClose);
+      siteMenuComponent.getElement().querySelector(`[value=${MenuItem.TASKS}]`).disabled = true;
       break;
     case MenuItem.TASKS:
       break;
@@ -40,8 +47,3 @@ siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 filterPresenter.init();
 boardPresenter.init();
-
-document.querySelector(`#control__new-task`).addEventListener(`click`, (evt) => {
-  evt.preventDefault();
-  boardPresenter.createTask();
-});
