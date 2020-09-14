@@ -1,9 +1,21 @@
 import flatpickr from "flatpickr";
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import SmartView from "./smart.js";
 import {getCurrentDate} from "../utils/task.js";
+import {countCompletedTaskInDateRange} from "../utils/statistics.js";
 
-const createStatisticsTemplate = () => {
-  const completedTasksCount = 0;
+const renderColorsChart = (colorsCtx, tasks) => {
+
+};
+
+const renderDaysChart = (daysCtx, tasks, dateFrom, dateTo) => {
+
+};
+
+const createStatisticsTemplate = (data) => {
+  const {tasks, dateFrom, dateTo} = data;
+  const completedTasksCount = countCompletedTaskInDateRange(tasks, dateFrom, dateTo);
 
   return (
     `<section class="statistic container">
@@ -54,6 +66,9 @@ export default class Statistics extends SmartView {
       dateTo: getCurrentDate(),
     };
 
+    this._colorsChart = null;
+    this._datesChart = null;
+
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
 
     this._setCharts();
@@ -62,6 +77,11 @@ export default class Statistics extends SmartView {
 
   removeElement() {
     super.removeElement();
+
+    if (this._colorsChart !== null || this._datesChart !== null) {
+      this._colorsChart = null;
+      this._datesChart = null;
+    }
 
     if (this._datepicker) {
       this._datepicker.destroy();
@@ -107,6 +127,16 @@ export default class Statistics extends SmartView {
   }
 
   _setCharts() {
+    if (this._colorsChart !== null || this._datesChart !== null) {
+      this._colorsChart = null;
+      this._datesChart = null;
+    }
 
+    const {tasks, dateFrom, dateTo} = this._data;
+    const colorsCtx = this.getElement().querySelector(`.statistic__colors`);
+    const daysCtx = this.getElement().querySelector(`.statistic__days`);
+
+    this._colorsChart = renderColorsChart(colorsCtx, tasks);
+    this._datesChart = renderDaysChart(daysCtx, tasks, dateFrom, dateTo);
   }
 }
