@@ -54,4 +54,4 @@ export const getDatesInRange = (dateFrom, dateTo) => {
   }
 
   return dates;
-}
+};
