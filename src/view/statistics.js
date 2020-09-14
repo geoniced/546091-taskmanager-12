@@ -3,17 +3,30 @@ import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import SmartView from "./smart.js";
 import {getCurrentDate} from "../utils/task.js";
-import {countCompletedTaskInDateRange} from "../utils/statistics.js";
+import {
+  colorToHex,
+  countCompletedTaskInDateRange,
+  countTaskByColor,
+  countTasksInDateRange,
+  getDatesInRange,
+  makeItemsUniq,
+  parseChartDate
+} from "../utils/statistics.js";
 
 const renderColorsChart = (colorsCtx, tasks) => {
+  const taskColors = tasks.map((task) => task.color);
+  const uniqColors = makeItemsUniq(taskColors);
+  const taskByColorCounts = uniqColors.map((color) => countTaskByColor(tasks, color));
+  const hexColors = uniqColors.map((color) => colorToHex[color]);
+
   return new Chart(colorsCtx, {
     plugins: [ChartDataLabels],
     type: `pie`,
     data: {
-      labels: [`BLACK`], // Сюда нужно передать названия уникальных цветов, они станут ярлыками
+      labels: uniqColors,
       datasets: [{
-        data: [1], // Сюда нужно передать в том же порядке количество задач по каждому цвету
-        backgroundColor: [`#000`] // Сюда нужно передать в том же порядке HEX каждого цвета
+        data: taskByColorCounts,
+        backgroundColor: hexColors
       }]
     },
     options: {
@@ -62,13 +75,17 @@ const renderColorsChart = (colorsCtx, tasks) => {
 };
 
 const renderDaysChart = (daysCtx, tasks, dateFrom, dateTo) => {
+  const dates = getDatesInRange(dateFrom, dateTo);
+  const parsedDates = dates.map(parseChartDate);
+  const taskInDateRangeCounts = countTasksInDateRange(dates, tasks);
+
   return new Chart(daysCtx, {
     plugins: [ChartDataLabels],
     type: `line`,
     data: {
-      labels: [`3 Sep`], // Сюда нужно передать названия дней
+      labels: parsedDates,
       datasets: [{
-        data: [1], // Сюда нужно передать в том же порядке количество задач по каждому дню
+        data: taskInDateRangeCounts,
         backgroundColor: `transparent`,
         borderColor: `#000000`,
         borderWidth: 1,
