@@ -19,6 +19,8 @@ const BLANK_TASK = {
     sa: false,
     su: false,
   },
+  isArchive: false,
+  isFavorite: false,
 };
 
 const createTaskEditDateTemplate = (dueDate, isDueDate) => {
