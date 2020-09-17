@@ -68,10 +68,10 @@ export default class Tasks extends Observer {
         }
     );
 
-    delete task.due_date;
-    delete task.is_archived;
-    delete task.is_favorite;
-    delete task.repeating_days;
+    delete adaptedTask.due_date;
+    delete adaptedTask.is_archived;
+    delete adaptedTask.is_favorite;
+    delete adaptedTask.repeating_days;
 
     return adaptedTask;
   }
@@ -88,10 +88,10 @@ export default class Tasks extends Observer {
         }
     );
 
-    delete task.dueDate;
-    delete task.isArchive;
-    delete task.isFavorite;
-    delete task.repeating;
+    delete adaptedTask.dueDate;
+    delete adaptedTask.isArchive;
+    delete adaptedTask.isFavorite;
+    delete adaptedTask.repeating;
 
     return adaptedTask;
   }
