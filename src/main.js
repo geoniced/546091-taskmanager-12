@@ -66,3 +66,13 @@ api.getTasks()
     render(siteHeaderElement, siteMenuComponent, RenderPosition.BEFOREEND);
     siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`)
+    .then(() => {
+      // Если регистрация сервис-воркера успешна
+      console.log(`Service worker is available`); // esling-disable-line
+    }).catch(() => {
+      console.log(`Service worker is not available`); // esling-disable-line
+    });
+});
