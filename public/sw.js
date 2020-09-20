@@ -79,7 +79,7 @@ const handleFetch = (evt) => {
 
               // Копию кладем в кэш
               caches.open(CACHE_NAME)
-                .then((cache) => cache.put(clonedResponse));
+                .then((cache) => cache.put(request, clonedResponse));
 
               // Оригинал запроса прокидываем дальше
               return response;
